@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Secure, modern Blood Donation Management System facilitating requests, inventory, and coordination between Donors, Recipients, Blood Banks, and Hospitals.">
+  <title>SaveLives - Blood Donation Management System</title>
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Font Awesome Icons via CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- ================= AUTH VIEW ================= -->
+  <div id="auth-view" class="auth-wrapper">
+    <!-- Login Card -->
+    <div id="login-card" class="auth-card glass">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <i class="fa-solid fa-droplet"></i>
+        </div>
+        <h2 class="auth-title">Welcome Back</h2>
+        <p class="auth-subtitle">Log in to manage your blood donations & requests</p>
+      </div>
+      
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email Address</label>
+          <input type="email" id="login-email" class="form-control" placeholder="admin@blood.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <a href="#forgot" id="btn-goto-forgot" style="font-size: 13px; color: var(--primary); text-decoration: none; font-weight: 500;">Forgot Password?</a>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          <i class="fa-solid fa-right-to-bracket"></i> Login
+        </button>
+      </form>
+      
+      <div class="auth-footer">
+        Don't have an account? <a href="#signup" id="btn-goto-signup">Sign up here</a>
+      </div>
+    </div>
+
+    <!-- Sign Up Card -->
+    <div id="signup-card" class="auth-card glass hidden">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <h2 class="auth-title">Create Account</h2>
+        <p class="auth-subtitle">Join our network to save lives</p>
+      </div>
+      
+      <form id="signup-form">
+        <div class="form-group">
+          <label class="form-label" for="signup-role">Select Your Role</label>
+          <select id="signup-role" class="form-control" required>
+            <option value="donor" selected>Donor (Give Blood)</option>
+            <option value="recipient">Recipient (Request Blood)</option>
+            <option value="blood_bank">Blood Bank (Store Blood)</option>
+            <option value="hospital">Hospital (Request & Store)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="signup-name">Full Name / Organization Name</label>
+          <input type="text" id="signup-name" class="form-control" placeholder="John Doe" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="signup-email">Email Address</label>
+          <input type="email" id="signup-email" class="form-control" placeholder="john@example.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="signup-password">Password</label>
+          <input type="password" id="signup-password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <!-- Dynamic signup fields based on role selection -->
+        <div id="role-extra-fields">
+          <!-- Donor Fields (Default) -->
+          <div id="donor-fields">
+            <div class="form-group row-group">
+              <div>
+                <label class="form-label" for="signup-blood">Blood Group</label>
+                <select id="signup-blood" class="form-control">
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" for="signup-gender">Gender</label>
+                <select id="signup-gender" class="form-control">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group row-group">
+              <div>
+                <label class="form-label" for="signup-age">Age</label>
+                <input type="number" id="signup-age" class="form-control" min="16" max="100" value="25">
+              </div>
+              <div>
+                <label class="form-label" for="signup-weight">Weight (kg)</label>
+                <input type="number" id="signup-weight" class="form-control" min="30" max="200" value="70">
+              </div>
+            </div>
+          </div>
+
+          <!-- Recipient Fields -->
+          <div id="recipient-fields" class="hidden">
+            <div class="form-group">
+              <label class="form-label" for="signup-recipient-blood">Required Blood Group</label>
+              <select id="signup-recipient-blood" class="form-control">
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shared Contact Fields -->
+        <div class="form-group row-group">
+          <div>
+            <label class="form-label" for="signup-location">Location (City, State)</label>
+            <input type="text" id="signup-location" class="form-control" placeholder="New York, NY" required>
+          </div>
+          <div>
+            <label class="form-label" for="signup-phone">Phone Number</label>
+            <input type="tel" id="signup-phone" class="form-control" placeholder="555-0199" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+          <i class="fa-solid fa-user-plus"></i> Register
+        </button>
+      </form>
+      
+      <div class="auth-footer">
+        Already have an account? <a href="#login" id="btn-goto-login">Log in here</a>
+      </div>
+    </div>
+
+    <!-- Forgot Password Card -->
+    <div id="forgot-card" class="auth-card glass hidden">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <i class="fa-solid fa-key"></i>
+        </div>
+        <h2 class="auth-title">Recover Password</h2>
+        <p class="auth-subtitle">Verify email to reset your account password</p>
+      </div>
+      
+      <!-- Phase 1: Request OTP -->
+      <form id="forgot-form-otp">
+        <div class="form-group">
+          <label class="form-label" for="forgot-email">Email Address</label>
+          <input type="email" id="forgot-email" class="form-control" placeholder="john@example.com" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          <i class="fa-solid fa-paper-plane"></i> Send OTP Code
+        </button>
+      </form>
+
+      <!-- Phase 2: Reset Form (Hidden until OTP sent) -->
+      <form id="forgot-form-reset" class="hidden">
+        <div class="form-group">
+          <label class="form-label" for="forgot-otp-code">Enter OTP Verification Code</label>
+          <input type="text" id="forgot-otp-code" class="form-control" placeholder="123456" required>
+          <span id="otp-demo-alert" style="font-size: 11px; color: var(--success); display: block; margin-top: 4px;"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="forgot-new-password">New Password</label>
+          <input type="password" id="forgot-new-password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          <i class="fa-solid fa-lock-open"></i> Reset Password
+        </button>
+      </form>
+      
+      <div class="auth-footer">
+        <a href="#login" id="btn-goto-login-from-forgot">Back to Login</a>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= MAIN APP VIEW ================= -->
+  <div id="app-view" class="app-container hidden">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-droplet"></i>
+        </div>
+        <span class="brand-name">SaveLives</span>
+      </div>
+      
+      <ul class="nav-links">
+        <li class="nav-item active" id="nav-dashboard">
+          <a href="#dashboard"><i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span></a>
+        </li>
+        <!-- Donor Links -->
+        <li class="nav-item hidden" id="nav-donor-history">
+          <a href="#history"><i class="fa-solid fa-clock-rotate-left"></i> <span>My Donations</span></a>
+        </li>
+        <li class="nav-item hidden" id="nav-search-camps">
+          <a href="#camps"><i class="fa-solid fa-tents"></i> <span>Search Camps</span></a>
+        </li>
+        <!-- Recipient & Hospital Links -->
+        <li class="nav-item hidden" id="nav-blood-requests">
+          <a href="#requests"><i class="fa-solid fa-hand-holding-hand"></i> <span>Blood Requests</span></a>
+        </li>
+        <!-- Blood Bank Links -->
+        <li class="nav-item hidden" id="nav-inventory">
+          <a href="#inventory"><i class="fa-solid fa-boxes-stacked"></i> <span>Inventory Stock</span></a>
+        </li>
+        <li class="nav-item hidden" id="nav-bank-requests">
+          <a href="#bank-requests"><i class="fa-solid fa-envelope-open-text"></i> <span>Pending Requests</span></a>
+        </li>
+        <!-- Shared Search Donors -->
+        <li class="nav-item" id="nav-search-donors">
+          <a href="#search-donors"><i class="fa-solid fa-magnifying-glass"></i> <span>Search Donors</span></a>
+        </li>
+        <!-- Shared Profile -->
+        <li class="nav-item" id="nav-profile">
+          <a href="#profile"><i class="fa-solid fa-user-gear"></i> <span>Edit Profile</span></a>
+        </li>
+      </ul>
+
+      <!-- Current User Badge -->
+      <div class="user-profile-badge">
+        <div class="user-avatar" id="avatar-letter">U</div>
+        <div class="user-details">
+          <span class="user-name" id="profile-display-name">Username</span>
+          <span class="user-role" id="profile-display-role">Role</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Panel Workspace -->
+    <main class="main-content">
+      <!-- Top Header -->
+      <header class="top-header">
+        <h1 class="page-title" id="page-title-text">Dashboard</h1>
+        
+        <div class="header-actions">
+          <!-- Notification Bell Dropdown Panel -->
+          <div style="position: relative;">
+            <div class="notification-bell" id="bell-btn">
+              <i class="fa-regular fa-bell"></i>
+              <span class="bell-badge hidden" id="bell-counter">0</span>
+            </div>
+            
+            <div class="notifications-dropdown glass hidden" id="notif-dropdown">
+              <div class="notif-header">
+                <span>Notifications</span>
+                <span class="notif-clear" id="btn-clear-notifications">Mark all read</span>
+              </div>
+              <div class="notif-list" id="notifications-list-container">
+                <!-- Injected dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Light/Dark Toggle -->
+          <div class="theme-toggle" id="theme-toggle-btn" title="Toggle Theme">
+            <i class="fa-solid fa-moon"></i>
+          </div>
+
+          <!-- Logout Button -->
+          <button class="btn btn-secondary btn-sm" id="btn-logout" title="Log Out">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </div>
+      </header>
+
+      <!-- VIEW PANELS -->
+      
+      <!-- 1. GENERAL DASHBOARD VIEW -->
+      <section id="panel-dashboard" class="view-panel">
+        
+        <!-- Stats Widgets -->
+        <div class="stats-grid" id="dashboard-stats-grid">
+          <!-- Populated dynamically based on user role stats -->
+        </div>
+
+        <div class="dashboard-grid" style="margin-top: 24px;">
+          <!-- Left Main Pane (Charts or Tables) -->
+          <div class="chart-panel glass">
+            <div class="panel-title" id="dashboard-main-chart-title">
+              Blood Stock Availability
+              <button class="btn btn-secondary btn-sm hidden" id="btn-download-report"><i class="fa-solid fa-file-arrow-down"></i> Export CSV</button>
+            </div>
+            
+            <!-- Dynamic inventory dials (SVG generated) -->
+            <div class="chart-container" id="inventory-dials-container">
+              <!-- Dials injected dynamically -->
+            </div>
+          </div>
+
+          <!-- Right Sidebar Pane (Recent Activities / Eligibility status) -->
+          <div class="chart-panel glass">
+            <div class="panel-title">Recent Timeline</div>
+            <div class="timeline" id="recent-activities-timeline">
+              <!-- Injected dynamically -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. DONOR HISTORY VIEW -->
+      <section id="panel-donor-history" class="view-panel hidden">
+        <div class="glass" style="padding: 28px;">
+          <div class="panel-title" style="margin-bottom: 20px;">Donation History</div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Date</th>
+                  <th>Camp Location / Organizer</th>
+                  <th>Blood Group</th>
+                  <th>Volume (Units)</th>
+                  <th>Fulfillment Status</th>
+                </tr>
+              </thead>
+              <tbody id="donor-history-table-body">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. DONATION CAMPS VIEW (DONOR) -->
+      <section id="panel-search-camps" class="view-panel hidden">
+        <div class="view-grid">
+          <!-- Camps List -->
+          <div class="glass" style="padding: 28px;">
+            <div class="panel-title" style="margin-bottom: 20px;">Upcoming Donation Camps</div>
+            <div style="display: flex; flex-direction: column; gap: 16px;" id="camps-list-container">
+              <!-- Camps card injected here -->
+            </div>
+          </div>
+          
+          <!-- Walk-in Donation Form -->
+          <div class="glass" style="padding: 28px;">
+            <div class="panel-title" style="margin-bottom: 20px;">Log a Donation</div>
+            <form id="donation-log-form">
+              <div class="form-group">
+                <label class="form-label" for="donation-camp">Select Camp / Location</label>
+                <select id="donation-camp" class="form-control" required>
+                  <option value="Walk-in Donation">Walk-in Donation (Central Clinic)</option>
+                  <option value="City Center Donation Drive">City Center Donation Drive</option>
+                  <option value="Annual Hospital Camp">Annual Hospital Camp</option>
+                  <option value="Suburban Blood Drive">Suburban Blood Drive</option>
+                </select>
+              </div>
+              <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+                Logging a donation updates your profile's last donation date. You must wait 90 days between donations.
+              </p>
+              <button type="submit" class="btn btn-primary" style="width: 100%;">
+                <i class="fa-solid fa-heart-circle-check"></i> Register Donation Unit
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. RECIPIENT & HOSPITAL BLOOD REQUESTS VIEW -->
+      <section id="panel-blood-requests" class="view-panel hidden">
+        <div class="view-grid">
+          <!-- Request Form -->
+          <div class="glass" style="padding: 28px;">
+            <div class="panel-title" style="margin-bottom: 20px;">Request Blood Units</div>
+            <form id="request-blood-form">
+              <div class="form-group">
+                <label class="form-label" for="req-blood-group">Required Blood Group</label>
+                <select id="req-blood-group" class="form-control" required>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="req-units">Units Required (Bags)</label>
+                <input type="number" id="req-units" class="form-control" min="1" max="10" value="1" required>
+              </div>
+              <div class="form-group" id="req-bank-selector-group">
+                <label class="form-label" for="req-blood-bank">Request Target Blood Bank</label>
+                <select id="req-blood-bank" class="form-control">
+                  <option value="">-- Post to General Network (Local Banks) --</option>
+                  <!-- Injected dynamically -->
+                </select>
+              </div>
+              <div class="form-group row-group">
+                <div>
+                  <label class="form-label" for="req-location">Fulfillment Location</label>
+                  <input type="text" id="req-location" class="form-control" placeholder="New York, NY" required>
+                </div>
+                <div>
+                  <label class="form-label" for="req-type">Priority Level</label>
+                  <select id="req-type" class="form-control">
+                    <option value="normal">Routine / Normal</option>
+                    <option value="emergency">CRITICAL EMERGENCY</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                <i class="fa-solid fa-paper-plane"></i> Submit Request
+              </button>
+            </form>
+          </div>
+
+          <!-- Pending Requests Tracker -->
+          <div class="glass" style="padding: 28px;">
+            <div class="panel-title" style="margin-bottom: 20px;">Fulfillment Progress Tracker</div>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Group</th>
+                    <th>Units</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="recipient-requests-table-body">
+                  <!-- Injected dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. INVENTORY STOCK MANAGEMENT VIEW (BLOOD BANK) -->
+      <section id="panel-inventory" class="view-panel hidden">
+        <div class="glass" style="padding: 28px;">
+          <div class="panel-title" style="margin-bottom: 20px;">
+            Stock Management Board
+            <span style="font-size: 13px; font-weight: normal; color: var(--text-muted);">Adjust available quantities below</span>
+          </div>
+          
+          <form id="inventory-edit-form">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 28px;" id="inventory-grid-editor">
+              <!-- Inputs injected dynamically -->
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Inventory Stock</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- 6. PENDING REQUESTS MANAGER VIEW (BLOOD BANK) -->
+      <section id="panel-bank-requests" class="view-panel hidden">
+        <div class="glass" style="padding: 28px;">
+          <div class="panel-title" style="margin-bottom: 20px;">Patient & Hospital Requests Inbox</div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Request Date</th>
+                  <th>Requester</th>
+                  <th>Type</th>
+                  <th>Blood Group</th>
+                  <th>Units Needed</th>
+                  <th>Priority</th>
+                  <th>Current Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bank-requests-table-body">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. GENERAL SEARCH DONORS & AVAILABILITY VIEW -->
+      <section id="panel-search-donors" class="view-panel hidden">
+        <!-- Search filter header bar -->
+        <div class="glass search-filter-bar">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="search-blood-group">Blood Group</label>
+            <select id="search-blood-group" class="form-control">
+              <option value="">All Blood Groups</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label" for="search-location">City / State</label>
+            <input type="text" id="search-location-input" class="form-control" placeholder="e.g. New York, NY">
+          </div>
+          <button class="btn btn-primary" id="btn-trigger-search" style="padding: 11px 24px;">
+            <i class="fa-solid fa-magnifying-glass"></i> Filter Search
+          </button>
+        </div>
+
+        <!-- Search Results -->
+        <div class="glass" style="padding: 28px; margin-top: 24px;">
+          <div class="panel-title" style="margin-bottom: 20px;">Matching Registered Donors</div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Donor Name</th>
+                  <th>Blood Group</th>
+                  <th>Location</th>
+                  <th>Contact Info</th>
+                  <th>Eligibility Status</th>
+                  <th>Age/Gender</th>
+                </tr>
+              </thead>
+              <tbody id="search-donors-results-table">
+                <!-- Results injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. SHARED PROFILE EDIT VIEW -->
+      <section id="panel-profile" class="view-panel hidden">
+        <div class="glass" style="padding: 28px; max-width: 600px; margin: 0 auto;">
+          <div class="panel-title" style="margin-bottom: 20px;">Update Profile Details</div>
+          
+          <form id="profile-edit-form">
+            <div class="form-group">
+              <label class="form-label" for="profile-name">Name / Institution Name</label>
+              <input type="text" id="profile-name" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-email">Email Address (Read-only)</label>
+              <input type="email" id="profile-email" class="form-control" disabled>
+            </div>
+            <div class="form-group row-group">
+              <div>
+                <label class="form-label" for="profile-phone">Contact Phone</label>
+                <input type="tel" id="profile-phone" class="form-control" required>
+              </div>
+              <div>
+                <label class="form-label" for="profile-location">Location (City, State)</label>
+                <input type="text" id="profile-location" class="form-control" required>
+              </div>
+            </div>
+
+            <!-- Donor specific edits -->
+            <div id="profile-donor-fields" class="hidden">
+              <div class="form-group row-group">
+                <div>
+                  <label class="form-label" for="profile-blood">Blood Group</label>
+                  <select id="profile-blood" class="form-control">
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label" for="profile-gender">Gender</label>
+                  <select id="profile-gender" class="form-control">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group row-group">
+                <div>
+                  <label class="form-label" for="profile-age">Age</label>
+                  <input type="number" id="profile-age" class="form-control" min="16" max="100">
+                </div>
+                <div>
+                  <label class="form-label" for="profile-weight">Weight (kg)</label>
+                  <input type="number" id="profile-weight" class="form-control" min="30" max="200">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profile-last-donation">Last Donation Date</label>
+                <input type="date" id="profile-last-donation" class="form-control">
+              </div>
+            </div>
+
+            <!-- Recipient specific edits -->
+            <div id="profile-recipient-fields" class="hidden">
+              <div class="form-group">
+                <label class="form-label" for="profile-recipient-blood">Required Blood Group</label>
+                <select id="profile-recipient-blood" class="form-control">
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 12px; width: 100%;">
+              <i class="fa-solid fa-check"></i> Save Changes
+            </button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ================= FLOATING DEMO CONTROLLER ================= -->
+  <div class="demo-controller glass" id="demo-controller-panel">
+    <div class="demo-header" id="demo-header-btn">
+      <span class="demo-title"><i class="fa-solid fa-gears"></i> Developer Control</span>
+      <i class="fa-solid fa-chevron-down" id="demo-toggle-icon"></i>
+    </div>
+    
+    <div class="demo-body" id="demo-body-panel">
+      <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px; line-height: 1.3;">
+        Click any role below to instantly log in with simulated credentials and seed data:
+      </p>
+      
+      <button class="demo-btn" data-email="admin@blood.com">
+        <span>System Admin</span>
+        <span class="demo-role-badge admin">Admin</span>
+      </button>
+      
+      <button class="demo-btn" data-email="donor@blood.com">
+        <span>John Donor (A+)</span>
+        <span class="demo-role-badge donor">Donor</span>
+      </button>
+      
+      <button class="demo-btn" data-email="recipient@blood.com">
+        <span>Mary Recipient</span>
+        <span class="demo-role-badge recipient">Recipient</span>
+      </button>
+      
+      <button class="demo-btn" data-email="bank@blood.com">
+        <span>City Central Bank</span>
+        <span class="demo-role-badge blood_bank">Bank</span>
+      </button>
+      
+      <button class="demo-btn" data-email="hospital@blood.com">
+        <span>St. Jude Hospital</span>
+        <span class="demo-role-badge hospital">Hospital</span>
+      </button>
+
+      <div style="border-top: 1px solid var(--panel-border); margin-top: 6px; padding-top: 10px; display: flex; justify-content: space-between;">
+        <button class="btn btn-secondary btn-sm" id="demo-btn-clear-db" style="padding: 6px 10px; font-size: 10px;">
+          <i class="fa-solid fa-trash-can"></i> Reset DB
+        </button>
+        <button class="btn btn-primary btn-sm" id="demo-btn-trigger-notif" style="padding: 6px 10px; font-size: 10px; background: var(--info);">
+          <i class="fa-solid fa-circle-exclamation"></i> Mock Alert
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script Declarations in Order -->
+  <script src="database.js"></script>
+  <script src="crypto-helper.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
